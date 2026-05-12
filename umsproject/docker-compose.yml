@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+
+  web:
+    build: .
+    container_name: ums_web
+
+    command: python manage.py runserver 0.0.0.0:8000
+
+    volumes:
+      - .:/app
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - .env
+
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16
+
+    container_name: ums_db
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+    environment:
+      POSTGRES_DB: umsdb
+      POSTGRES_USER: umsuser
+      POSTGRES_PASSWORD: umspassword
+
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
