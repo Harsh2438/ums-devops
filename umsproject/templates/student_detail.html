@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}{{ student.user.get_full_name }} | UniManage{% endblock %}
+{% block page_title %}Student Profile{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Profile Card -->
+    <div class="col-md-4">
+        <div class="card stat-card text-center p-4">
+            {% if student.photo %}
+            <img src="{{ student.photo.url }}" class="rounded-circle mx-auto mb-3"
+                 style="width:100px;height:100px;object-fit:cover;">
+            {% else %}
+            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3"
+                 style="width:100px;height:100px;">
+                <i class="fas fa-user fa-3x text-white"></i>
+            </div>
+            {% endif %}
+            <h5 class="fw-bold mb-0">{{ student.user.get_full_name }}</h5>
+            <p class="text-muted small">{{ student.roll_number }}</p>
+            <span class="badge bg-primary">Year {{ student.year }}</span>
+
+            <hr>
+            <div class="text-start">
+                <div class="mb-2"><i class="fas fa-building me-2 text-muted"></i>{{ student.department.name|default:"—" }}</div>
+                <div class="mb-2"><i class="fas fa-envelope me-2 text-muted"></i>{{ student.user.email }}</div>
+                <div class="mb-2"><i class="fas fa-phone me-2 text-muted"></i>{{ student.phone|default:"—" }}</div>
+                <div class="mb-2"><i class="fas fa-birthday-cake me-2 text-muted"></i>{{ student.date_of_birth|default:"—" }}</div>
+                <div><i class="fas fa-map-marker-alt me-2 text-muted"></i>{{ student.address|default:"—" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrollments -->
+    <div class="col-md-8">
+        <div class="card table-card">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Enrolled Courses & Grades</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Status</th>
+                            <th>Marks</th>
+                            <th>Grade</th>
+                            {% if user.is_staff or user.professor %}
+                            <th>Action</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in enrollments %}
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">{{ enrollment.course.name }}</div>
+                                <small class="text-muted">{{ enrollment.course.code }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if enrollment.status == 'active' %}success{% elif enrollment.status == 'dropped' %}danger{% else %}secondary{% endif %}">
+                                    {{ enrollment.status|capfirst }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if enrollment.grade %}
+                                {{ enrollment.grade.marks_obtained }}/{{ enrollment.grade.total_marks }}
+                                ({{ enrollment.grade.percentage }}%)
+                                {% else %}—{% endif %}
+                            </td>
+                            <td>
+                                {% if enrollment.grade %}
+                                <span class="badge bg-primary">{{ enrollment.grade.grade }}</span>
+                                {% else %}—{% endif %}
+                            </td>
+                            {% if user.is_staff or user.professor %}
+                            <td>
+                                <a href="{% url 'grade_entry' enrollment.pk %}" class="btn btn-sm btn-outline-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center text-muted py-3">Not enrolled in any course.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

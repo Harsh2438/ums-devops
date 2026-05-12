@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Mark Attendance | UniManage{% endblock %}
+{% block page_title %}Mark Attendance{% endblock %}
+
+{% block content %}
+<div class="card table-card">
+    <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold">{{ course.name }} — Attendance</h6>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Date</label>
+                <input type="date" name="date" class="form-control" style="max-width:200px;"
+                       value="{{ today|date:'Y-m-d' }}" required>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr><th>#</th><th>Roll No.</th><th>Name</th><th>Present</th></tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in enrollments %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ enrollment.student.roll_number }}</td>
+                        <td>{{ enrollment.student.user.get_full_name }}</td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox"
+                                       name="student_{{ enrollment.student.pk }}"
+                                       checked>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center text-muted py-3">No students enrolled.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>Save Attendance
+                </button>
+                <a href="{% url 'course_detail' course.pk %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

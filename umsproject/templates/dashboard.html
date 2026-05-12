@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | UniManage{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small mb-1">Total Students</div>
+                    <div class="fs-3 fw-bold">{{ total_students }}</div>
+                </div>
+                <div class="icon" style="background:#e8f4fd; color:#1a3c5e;">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small mb-1">Total Courses</div>
+                    <div class="fs-3 fw-bold">{{ total_courses }}</div>
+                </div>
+                <div class="icon" style="background:#fef9e7; color:#e67e22;">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small mb-1">Departments</div>
+                    <div class="fs-3 fw-bold">{{ total_departments }}</div>
+                </div>
+                <div class="icon" style="background:#eafaf1; color:#27ae60;">
+                    <i class="fas fa-building"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small mb-1">Professors</div>
+                    <div class="fs-3 fw-bold">{{ total_professors }}</div>
+                </div>
+                <div class="icon" style="background:#f9ebea; color:#e74c3c;">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Role-specific content -->
+    {% if role == 'student' %}
+    <div class="col-lg-8">
+        <div class="card table-card">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">My Enrolled Courses</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Course</th>
+                            <th>Professor</th>
+                            <th>Credits</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in enrollments %}
+                        <tr>
+                            <td><span class="badge bg-primary">{{ enrollment.course.code }}</span></td>
+                            <td>{{ enrollment.course.name }}</td>
+                            <td>{{ enrollment.course.professor.user.get_full_name|default:"TBA" }}</td>
+                            <td>{{ enrollment.course.credits }}</td>
+                            <td>
+                                <a href="{% url 'course_detail' enrollment.course.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center text-muted py-3">No enrolled courses yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% elif role == 'professor' %}
+    <div class="col-lg-8">
+        <div class="card table-card">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">My Courses</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr><th>Code</th><th>Course</th><th>Enrolled</th><th>Semester</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for course in courses %}
+                        <tr>
+                            <td><span class="badge bg-primary">{{ course.code }}</span></td>
+                            <td>{{ course.name }}</td>
+                            <td>{{ course.enrolled_count }}/{{ course.max_students }}</td>
+                            <td>{{ course.semester }}</td>
+                            <td>
+                                <a href="{% url 'course_detail' course.pk %}" class="btn btn-sm btn-outline-primary">Manage</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center text-muted py-3">No courses assigned yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% elif role == 'admin' %}
+    <div class="col-lg-8">
+        <div class="card table-card">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold">Recently Enrolled Students</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr><th>Roll No.</th><th>Name</th><th>Department</th><th>Year</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        {% for student in recent_students %}
+                        <tr>
+                            <td>{{ student.roll_number }}</td>
+                            <td>{{ student.user.get_full_name }}</td>
+                            <td>{{ student.department.code|default:"—" }}</td>
+                            <td>Year {{ student.year }}</td>
+                            <td><a href="{% url 'student_detail' student.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Announcements -->
+    <div class="col-lg-4">
+        <div class="card stat-card">
+            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold">Announcements</h6>
+                {% if user.is_staff or user.professor %}
+                <a href="{% url 'announcement_create' %}" class="btn btn-sm btn-primary">+ Post</a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% for ann in announcements %}
+                <div class="border-start border-3 border-warning ps-3 mb-3">
+                    <div class="fw-semibold small">{{ ann.title }}</div>
+                    <div class="text-muted" style="font-size:.8rem;">{{ ann.content|truncatechars:100 }}</div>
+                    <div class="text-muted" style="font-size:.75rem;">{{ ann.created_at|date:"M d, Y" }}</div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center small">No announcements.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

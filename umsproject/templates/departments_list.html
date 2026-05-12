@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Departments | UniManage{% endblock %}
+{% block page_title %}Departments{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+    {% if user.is_staff %}
+    <div class="col-12 text-end">
+        <a href="{% url 'department_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Add Department
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    {% for dept in departments %}
+    <div class="col-md-4">
+        <div class="card stat-card p-4">
+            <div class="d-flex align-items-start gap-3">
+                <div class="icon" style="background:#e8f4fd; color:#1a3c5e; min-width:52px;">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div>
+                    <div class="fw-bold fs-5">{{ dept.name }}</div>
+                    <div class="badge bg-secondary mb-2">{{ dept.code }}</div>
+                    <p class="text-muted small mb-2">{{ dept.description|default:"No description."|truncatechars:100 }}</p>
+                    <div class="d-flex gap-3">
+                        <span class="text-muted small"><i class="fas fa-user-graduate me-1"></i>{{ dept.student_count }} students</span>
+                        <span class="text-muted small"><i class="fas fa-book me-1"></i>{{ dept.course_count }} courses</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center text-muted py-5">
+        No departments found. <a href="{% url 'department_create' %}">Create one.</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

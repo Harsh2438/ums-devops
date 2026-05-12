@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Teachers | UniManage{% endblock %}
+{% block page_title %}Teachers{% endblock %}
+
+{% block content %}
+<div class="card table-card">
+    <div class="card-header bg-white border-0 py-3">
+        <div class="row align-items-center">
+            <div class="col"><h6 class="mb-0 fw-bold">All Teachers</h6></div>
+            <div class="col-auto">
+                {% if user.is_staff %}
+                <a href="{% url 'professor_register' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-user-plus me-1"></i>Register Teacher
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead>
+                <tr><th>Employee ID</th><th>Name</th><th>Department</th><th>Designation</th><th>Email</th></tr>
+            </thead>
+            <tbody>
+                {% for prof in professors %}
+                <tr>
+                    <td><span class="badge bg-secondary">{{ prof.employee_id }}</span></td>
+                    <td class="fw-semibold">{{ prof.user.get_full_name }}</td>
+                    <td>{{ prof.department.name|default:"—" }}</td>
+                    <td>{{ prof.designation }}</td>
+                    <td>{{ prof.user.email }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No teachers found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
